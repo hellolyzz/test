@@ -107,3 +107,10 @@ link 可以通过 rel="alternate stylesheet" 指定候选样式
  + 可以借助 vertical-align:top; 消除垂直间隙
  + 可以在父级加 font-size：0; 在子元素里设置需要的字体大小，消除垂直间隙
  + 把 li 标签写到同一行可以消除垂直间隙，但代码可读性差
+
+
+ ## 请列举几种隐藏元素的方法
+ + visibility: hidden; 隐藏某个元素，但是其占用的空间任然存在
+ + opacity: 0; 让一个元素透明显示
+ + display: none; 元素不可见且不会占用文档空间
+ + transform: scale(0); 将一个元素设置为缩放无限小，元素将不可见，元素原来所在的位置将被保留
