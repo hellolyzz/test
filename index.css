@@ -3,7 +3,30 @@
   height: 0px;
   border: 100px solid black;
   border-left-color:red;
-  border-right-color: blue;
-  border-bottom-color: blueviolet;
-  border-top-color: brown;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  border-top-color: transparent;
+  /* display: none;*/
+  /* visibility: hidden; */
+ } 
+/* .box{
+  height: 0px;
+  width: 0px;
+  border-width: 100px;
+  border-style: solid;
+  border-color: black transparent transparent transparent;
+} */
+.aa{
+  width: 200px;
+  border: 1px solid black;
+  height: 50px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* visibility: hidden; */
+}
+.bb{
+  background-color: #ccc;
+  /* visibility: visible; */
 }
