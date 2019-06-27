@@ -46,6 +46,7 @@ str1 instanceof String // true
 1. 先判断是原始值还是引用值
 2. 再区分引用值
 3. 用object.prototype.toString.call(target);来判断引用类型
+```
 function type(target){
   var ret = typeof(target);
   var template = {
@@ -64,7 +65,7 @@ if(target === null){ //null
   return ret;
 }
 }
-
+```
 ## Boolean 转换
 除了以下数据，其余转换皆为 true
 + false 
@@ -145,7 +146,8 @@ a == false; -->false
 4. 依次看看原始对象是什么，判断是[]/{}
 5. 递归
 
-`function deepClone(origin, target){
+```
+function deepClone(origin, target){
   var target = target || {};
   toStr = Object.prototype.toString;
   arrStr = "[Object Array]";
@@ -160,7 +162,8 @@ a == false; -->false
     }
   }
   return target;
-}`
+}
+```
 
 ## obj.toString() 和 Object.prototype.toString.call(obj) 结果为什么不一样？
 这是因为 toString 为 Object 的原型方法，而 Array, function 等类型作为Object的实例，都重写了 toString 方法。不同的对象类型调用 toString 方法时，根据原型链的知识，调用的是对应的重写之后的 toString 方法（function类型返回内容为函数体的字符串，Array类型返回元素组成的字符串.....），而不会去调用Object上原型toString方法（返回对象的具体类型），所以采用obj.toString()不能得到其对象类型，只能将obj转换为字符串类型；因此，在想要得到对象的具体类型时，应该调用Object上原型toString方法。
@@ -207,6 +210,7 @@ a == false; -->false
 ## 闭包
 + 当内部的函数一旦被保存到了外部就会生成闭包，闭包会导致原有的作用域链不释放，造成内存的泄露。
 + 内部函数在外面执行的时候仍然可以调用在以前环境的额变量
+```
 function a(){
   var num = 100;
   function b(){
@@ -218,6 +222,7 @@ function a(){
 var demo = a();
 demo(); // 101
 demo(); // 102
+```
 解决办法：立即执行函数
 
 ## 闭包的作用
@@ -239,3 +244,37 @@ var test = function(){...}()
 + +/-/*// function test(){...} 合成了表达式
 
 ## 闭包函数及其解决办法举例
++ 闭包函数
+```
+function test(){
+  var arr = [];
+  for(var i = 0; i < 10 ; i ++){
+    arr[i] = function(){
+      console.log(i);
+    }
+  }
+  return arr;
+}
+var myArr = test();
+for(var j = 0; j < 10; j++){
+  myArr[j]();
+}/// 10个10
+```
++ 立即执行函数解决
+```
+function test(){
+  var arr = [];
+  for(var i = 0; i < 10; i++){
+    (function(j){
+      arr[j] = function(){
+        console.log(j);
+      }
+    }(i))
+  }
+  return arr;
+}
+var myArr = test();
+for(var j = 0; j < 10; j++){
+  myArr[j]();
+}/// 0123456789
+```
