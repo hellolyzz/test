@@ -2,15 +2,15 @@
 把括号里的字符串当做js代码来执行，但是有缺点。
 + 耗性能，先解析成js语句，再执行
 
-## JS变量类型
-# 原始值
+# JS变量类型
+## 原始值
 1. string
 2. number
 3. symbol
 4. null
 5. boolean
 6. undefined
-# 引用值
+## 引用值
 1. 数组 array
 2. 对象 object
 3. 函数 function
@@ -67,7 +67,13 @@ if(target === null){ //null
 
 ## Boolean 转换
 除了以下数据，其余转换皆为 true
-false 0 null -0 '' undefined NaN
++ false 
++ 0 
++ null
++ -0
++ ''
++ undefined
++ NaN
 
 ## 一个字符串为什么会有 length 属性？
 通过字面量的方式创建：var a = 'string'; 这时 string 是基本类型值；通过构造函数的方式创建：var a = new String('string');这时它是对象类型。
@@ -109,3 +115,127 @@ false 0 null -0 '' undefined NaN
 6. 判断其中一方是否为 object 且另一方为 string、number 或者 symbol，是的话就会把 object 转为原始类型再进行判断
 7. 两边都是对象的话，那么只要不是同一对象的不同引用，都为false
 + 注意，只要出现NaN，就一定是false，因为就连NaN自己都不等于NaN 对于NaN，判断的方法是使用全局函数 isNaN()
+
+## {}等于true/false
+var a = {};
+a == true; -->false
+a == false; -->false
++ a.toString() --> '[object Object]' --> NaN
+
+## 区别对象(Object)和数组(Array)
+1. constructor 属性返回对创建此对象的函数的引用
++ obj.constructor === Array
++ obj.constructor === Object
+2. instanceof
++ obj instanceof Array
++ obj instanceof Object
+3. 最好的方法
+`Object.prototype.toString.call(obj) == '[object Array]'`
+
+## hasOwnProperty()
++ 用来检测一个对象是否含有特定的自身属性
++ 和 in 运算符不同，该方法会忽略掉那些从原型链上继承到的属性
++ 返回值为 true/false
++ in 只能判断能不能访问这个属性，而不能判断是否是自己身上的属性
+
+## 深度克隆
+1. 先把要克隆的数据遍历一遍，区分是原始值还是引用值。for(var prop in obj) 数组、对象都可以用。
+2. 判断是原始值还是引用值。 typeof() == obj 即为引用值，原始值就直接拷贝。
+3. 引用值，判断是[]/{}。用toString()方法，随后简历空的 []/{}.
+4. 依次看看原始对象是什么，判断是[]/{}
+5. 递归
+
+`function deepClone(origin, target){
+  var target = target || {};
+  toStr = Object.prototype.toString;
+  arrStr = "[Object Array]";
+  for(var prop in origin){
+    if(origin.hasOwnProperty(prop)){
+      if(origin[prop] !== "null" && typeof(origin[prop]) == 'object'){
+        target[prop] = toStr.call(origin[prop] == arrStr ? [] : {});
+        deepClone(origin[prop],target[prop]);
+      }else{
+        target[prop] = origin[prop];
+      }
+    }
+  }
+  return target;
+}`
+
+## obj.toString() 和 Object.prototype.toString.call(obj) 结果为什么不一样？
+这是因为 toString 为 Object 的原型方法，而 Array, function 等类型作为Object的实例，都重写了 toString 方法。不同的对象类型调用 toString 方法时，根据原型链的知识，调用的是对应的重写之后的 toString 方法（function类型返回内容为函数体的字符串，Array类型返回元素组成的字符串.....），而不会去调用Object上原型toString方法（返回对象的具体类型），所以采用obj.toString()不能得到其对象类型，只能将obj转换为字符串类型；因此，在想要得到对象的具体类型时，应该调用Object上原型toString方法。
+
+# this
+## this 指向？
+1. 函数预编译过程中，this --> window
+2. 全局作用域里，this --> window
+3. call/apply/bind 可以改变 this 的指向
+4. 作为某对象的方法调用，this通常指向调用的对象
+5. 在构造函数中，this指向新创建的对象
+6. 箭头函数没有单独的this值，this在箭头函数创建时确定，它与声明所在的上下文相同
+7. 箭头函数的 this 一旦被绑定，就不会再被任何方式所改变
+
+#函数
+##函数声明
+1. function 函数名(){} 函数名要小驼峰式命名规则
+2. 命名函数表达式 var test = function abc(){...}
+3. 匿名函数表达式（函数表达式）最常用 var demo = function(){...}
+
+## 组成形式
+1. 形参相当于在函数体里面 var 一个变量
+2. 形参个数可以不等于实参个数
+3. 实参会放到一个argument[]数组里面，argument数组可以求 length，可以遍历元素
+4. 也可以通过函数名求length
+5. 实参个数 = 形参个数时候，更改 argument 里的值或更改实参，形参都会发生改变。但二者不是同一个东西，一个变另一个跟着变。
+6. 形参个数 > 实参个数时候，实参列表出生几个就是几个，后面给形参赋值也不会往实参里面加，不映射。
+
+## JS执行三步
+1. 语法分析 通篇扫描是否有语法错误
+2. 预编译 发生在函数执行的前一刻
+3. 解释执行 一行行执行
+
+## 函数体里面的预编译（发生在函数执行的前一刻）
+1. 创建AO(Activation Object执行期上下文)对象
+2. 找形参和变量声明，将变量和形参作为AO属性名值为undefined
+3. 将实参和形参相统一
+4. 在函数体里面找函数声明(function xx(){..})，放到AO里面，其值为其本身的函数体
+
+## 全局变量
+1. imply global 暗示全局变量，即任何变量如果未经声明就赋值，此变量就为全局对象所有 window
+2. 一切声明的全局变量，全是window的属性 var a = 123; <==> window.a = 123;
+
+## 闭包
++ 当内部的函数一旦被保存到了外部就会生成闭包，闭包会导致原有的作用域链不释放，造成内存的泄露。
++ 内部函数在外面执行的时候仍然可以调用在以前环境的额变量
+function a(){
+  var num = 100;
+  function b(){
+    num ++;
+    console.log(num);
+  }
+  return b;
+}
+var demo = a();
+demo(); // 101
+demo(); // 102
+解决办法：立即执行函数
+
+## 闭包的作用
+1. 实现公有变量（函数累加器）
+2. 可以做缓存（存贮结构）
+3. 实现封装，属性私有化
+4. 模块化开发，防止污染全局变量
+
+## 立即执行函数
++ 主要针对初始化功能的函数
++ 执行完立即释放
++ 被执行符号执行的表达式会自动忽略函数的名字
++ 只有`表达式`才能被执行符号('()')执行。test()
++ 表达方式
+    + (function(){}()); 常用
+    + (function(){})();
++ 例如：
+var test = function(){...}()
++ +/-/*// function test(){...} 合成了表达式
+
+## 闭包函数及其解决办法举例
