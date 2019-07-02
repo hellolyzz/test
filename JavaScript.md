@@ -25,7 +25,7 @@
 注意：
 + typeof(typeof(a)) --> string  因为typeof(a)的返回值是"undefiend"字符串
 + NaN != NaN != 任何数
-+ typeof(a) --> undefined  唯一一个不定义变量不会出错的情况
++ typeof(a) --> undefined(字符串类型) 唯一一个不定义变量不会出错的情况
 + undefined == null; --> true
 + 1 + undefined --> NaN
 
@@ -261,7 +261,7 @@ for(var j = 0; j < 10; j++){
 }/// 10个10
 ```
 + 立即执行函数解决
-```
+```javascript
 function test(){
   var arr = [];
   for(var i = 0; i < 10; i++){
@@ -278,3 +278,101 @@ for(var j = 0; j < 10; j++){
   myArr[j]();
 }/// 0123456789
 ```
+## , 逗号运算符
+把逗号后面的运算表达式传出去
+eg: var a = (1-1, 1+1)  ==>  a = 2;
+
+## if/() 都会使函数变成表达式然后消失
+eg: 
+var x = 1;
+if(function f(){}){
+  x += typeof f;
+}
+console.log(x);  ==> 1undefined
+
+## 构造函数的内部原理
+1. 在函数的最前面隐式加上 this = { __proto__:test.prototype};
+2. 执行 this.xxx = xxx;
+3. 隐式的返回 this
+
+## 创建对象的方式
+1. 对象字面量
++ var obj1 = {};
+2. 构造函数创建
++ var obj2 = new Object();
+3. var obj3 = Object.create(test);
+
+## 包装类
++ 属性、方法是对象所独有的
++ 给原始值赋属性会调用包装类
+
+## 原型(prototype)
++ 定义：原型是function对象的一个属性，它定义了构造函数制造出的对象的公共祖先。通过该构造函数产生的对象，可以继承该原型的属性和方法。原型也是一个对象。
++ 不可以通过后代对象修改祖先属性，若修改的话也只是往自己身上添加属性
++ JavaScript 的所有对象中都包含了一个 `__proto__` 内部属性，这个属性所对应的就是该对象的原型
++ JavaScript 的函数对象，除了原型 `__proto__` 之外，还预置了 prototype 属性
++ 当函数对象作为构造函数创建实例时，该 prototype 属性值将被作为实例对象的原型 `__proto__`
++ 查看对象的构造函数 `.constructor`
++ 查看对象的原型 `__proto__`
+
+## 原型链
++ object.prototype 是所有原型链的终端
++ 任何一个实例对象通过原型链可以找到它对应的原型对象，原型对象上面的实例和方法都是实例所共享的。
++ 一个对象在查找以一个方法或属性时，他会先在自己的对象上去找，找不到时，他会沿着原型链依次向上查找。
++ 注意： 函数才有prototype，实例对象只有有__proto__， 而函数有的__proto__是因为函数是Function的实例对象
++ object.create(null)没有object.prototype 原型，null undefined 无toString()这个属性
+
+## call/apply 改变 this 指向
+1. call(obj, para1, para2)
++ this 指向 obj, para1, para2 为参数
+2. apply(obj, [tel, class)
+3. 区别
++ call 把实参按照形参个数穿进去
++ apply 传一个 argument 数组，数组里面放的是参数
+
+## call/apply 实例
+```
+function School(grade, Class){
+  this.grade = grade;
+  this.Class = Class;
+}
+function Person(name, age){
+  this.name = name;
+  this.age = age;
+}
+function Student(grade, Class, name, age, tel, sex){
+  this.tel = tel;
+  this.sex = sex;
+  // Person.call(this, name, age);
+  // School.call(this, grade, Class);
+  Person.apply(this,[name, age]);  //this指向Person里的this
+  School.apply(this,[grade, Class]);
+}
+var student = new Student('grade1', 'class2', 'an', '20', '123456', 'male');
+console.log(student);
+```
+
+## 继承
+1. 通过原型链形式继承（传统形式） prototype
++ 原理：把子类的prototype（原型对象）直接设置为父类的实例
++ 缺点：会过多继承了没用的属性
+2. 构造函数中 Parent.call(this) 的方法继承父类属性。
++ 原理： 将子类的this使用父类的构造函数走一遍
++ 缺点： 
+    + Parent原型链上的属性和方法并不会被子类继承
+```
+function Parent() {
+  this.name = 'parent'
+}
+
+function Child() {
+  Parent.call(this);
+  this.type = 'child'
+}
+```
+3. 共享原型
++ 缺点：不能随便改动自己的原型
++ Son.prototype = Father.prototype;
+
+4. 最优继承模式（圣杯模式）
+

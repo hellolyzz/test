@@ -111,4 +111,55 @@ for(var j = 0; j < 10; j++){
   myArr[j]();
 }/// 0123456789
 
+console.log(typeof(typeof(khncnds)));  //string
+
+var x = 1;
+if(function f(){}){
+  x += typeof f;
+}
+console.log(x);
+
+
+// call/apply 实例
+function School(grade, Class){
+  this.grade = grade;
+  this.Class = Class;
+}
+function Person(name, age){
+  this.name = name;
+  this.age = age;
+}
+function Student(grade, Class, name, age, tel, sex){
+  this.tel = tel;
+  this.sex = sex;
+  // Person.call(this, name, age);
+  // School.call(this, grade, Class);
+  Person.apply(this,[name, age]);
+  School.apply(this,[grade, Class]);
+}
+var student = new Student('grade1', 'class2', 'an', '20', '123456', 'male');
+console.log(student);
+
+// 最好的继承模式
+function Father(){
+  name: '123'
+}
+function Son(){
+  age: '22'
+}
+
+function inherit(Target, Origin){
+  function F(){}; // 私有化变量
+  F.prototype = Origin.prototype;
+  Target.prototype = new F();
+  Target.prototype.constructor = Target;
+  Target.prototype.uber = Origin.prototype;
+}
+Father.prototype.lastname = "Lee";
+inherit(Son, Father);
+
+var son = new Son();
+var father = new Father();
+
+console.log(son);
 
